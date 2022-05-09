@@ -22,6 +22,11 @@ io.on("connection", (socket) => {
     console.log(`User with id: ${socket.id} joined room ${data}`);
   });
 
+  socket.on("send_message", (data) => {
+    //emit message only to a specific room
+    socket.to(data.room).emit("receive_message", data);
+  });
+
   socket.on("disconnect", () => {
     console.log("user disconnected", socket.id);
   });
