@@ -1,11 +1,9 @@
 // @ts-nocheck
 import React, { useEffect, useState } from "react";
-import { SocketContext } from "App";
 
-const Chat = ({ username, room }) => {
+const Chat = ({ socket, username, room }) => {
   const [currentMessage, setCurrentMessage] = useState("");
   const [messageList, setMessageList] = useState([]);
-  const socket = React.useContext(SocketContext);
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -18,8 +16,9 @@ const Chat = ({ username, room }) => {
           ":" +
           new Date(Date.now()).getMinutes(),
       };
+
       await socket.emit("send_message", messageData);
-      // setMessageList((list) => [...list, messageData]);
+      setMessageList((list) => [...list, messageData]);
       setCurrentMessage("");
     }
   };
@@ -30,23 +29,40 @@ const Chat = ({ username, room }) => {
     socket.on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
-  }, [socket, messageList]);
+  }, [socket]);
 
   return (
-    <div>
+    <div className="chat-window">
       <div className="chat-header">
         <p>Live chat</p>
       </div>
-      <div className="chat-body" style={{ height: "200px" }}>
-        {messageList.map((msg) => (
-          <div key={msg.time}>
-            <h1>{msg.message}</h1>
-          </div>
-        ))}
+      <div
+        className="chat-body"
+      >
+        {messageList.map((messageContent, index) => {
+          return (
+            <div
+              key={index}
+              className="message"
+              id={username === messageContent.author ? "sender" : "receiver"}
+            >
+              <div>
+                <div className="message-content">
+                  <p>{messageContent.message}</p>
+                </div>
+                <div className="message-meta">
+                  <p id="time">{messageContent.time}</p>
+                  <p id="author">{messageContent.author}</p>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
       <div className="chat-footer">
         <input
           type="text"
+          value={currentMessage}
           placeholder="Hey..."
           onChange={(event) => setCurrentMessage(event.target.value)}
           onKeyPress={(event) => {

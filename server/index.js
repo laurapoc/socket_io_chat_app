@@ -16,7 +16,7 @@ const io = new Server(server, {
 io.on("connection", (socket) => {
   console.log(`USER CONNECTED with id: ${socket.id}`);
 
-  // create an event which determined if someone wants to join teh room:
+  // create an event which determines if someone wants to join the room:
   socket.on("join_room", (data) => {
     socket.join(data);
     console.log(`User with id: ${socket.id} joined room ${data}`);
