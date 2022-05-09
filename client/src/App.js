@@ -1,7 +1,43 @@
+// @ts-nocheck
 import "./App.css";
+import io from "socket.io-client";
+import React, { useState } from "react";
+import Chat from "Chat";
+
+//connect to back-end
+// @ts-ignore
+const socket = io.connect("http://localhost:3001");
 
 function App() {
-  return <div className="App">Chat app</div>;
+  const [username, setUsername] = useState("");
+  const [room, setRoom] = useState("");
+
+  const joinRoom = () => {
+    if (username !== "" && room !== "") {
+      // emit an event in socket.io from front-end:
+      socket.emit("join_room", room);
+    }
+  };
+
+  return (
+    <div className="App">
+      <h3>Join a chat</h3>
+      <input
+        type="text"
+        placeholder="John..."
+        onChange={(event) => setUsername(event.target.value)}
+      />
+      {/* only people, joinde the room, can talk to each other */}
+      <input
+        type="text"
+        placeholder="Room id..."
+        onChange={(event) => setRoom(event.target.value)}
+      />
+      <button onClick={joinRoom}>Join a room</button>
+
+      <Chat socket={socket} username={username} room={room} />
+    </div>
+  );
 }
 
 export default App;
