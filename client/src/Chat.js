@@ -26,7 +26,10 @@ const Chat = ({ socket, username, room }) => {
   //listen if there are any changes in a socket.io
   useEffect(() => {
     // listen to an event called "receive_message"
-    socket.on("receive_message", (data) => {
+    // .off(eventName): it prevents the specified event handler from firing. 
+    // There are also less-common use cases where it is necessary 
+    // to unsubscribe sockets from rooms while they are still connected
+    socket.off("receive_message").on("receive_message", (data) => {
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
@@ -36,9 +39,7 @@ const Chat = ({ socket, username, room }) => {
       <div className="chat-header">
         <p>Live chat</p>
       </div>
-      <div
-        className="chat-body"
-      >
+      <div className="chat-body">
         {messageList.map((messageContent, index) => {
           return (
             <div
